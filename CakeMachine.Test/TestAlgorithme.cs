@@ -32,6 +32,7 @@ public class TestAlgorithme
     [InlineData(typeof(AntiRebut), false)]
     [InlineData(typeof(Optimisée1Poste), false)]
     [InlineData(typeof(UsineEtalon), false)]
+    [InlineData(typeof(AlgoPremiersPas), true)]
     public async Task TestNombreGâteauxEn5Secondes(Type algorithme, bool sync)
     {
         var runner = new SingleAlgorithmRunner(algorithme);
@@ -56,6 +57,7 @@ public class TestAlgorithme
     [InlineData(typeof(AntiRebut), false)]
     [InlineData(typeof(Optimisée1Poste), false)]
     [InlineData(typeof(UsineEtalon), false)]
+    [InlineData(typeof(AlgoPremiersPas), true)]
     public async Task TestTempsPour100Gateaux(Type algorithme, bool sync)
     {
         var runner = new SingleAlgorithmRunner(algorithme);
