@@ -2,12 +2,14 @@ using System.Collections.Concurrent;
 using CakeMachine.Fabrication.Elements;
 using CakeMachine.Fabrication.Opérations;
 using CakeMachine.Fabrication.Paramètres;
+using CakeMachine.Fabrication.Tracing;
 using CakeMachine.Utils;
 
 namespace CakeMachine.Fabrication.ContexteProduction;
 
 internal class Usine : IUsine
 {
+    private readonly ITraceSink _traceSink;
     private readonly ConcurrentBag<Plat> _platsCréés = new();
     private readonly ConcurrentBag<IConforme> _rebut = new();
 
@@ -18,24 +20,25 @@ internal class Usine : IUsine
     public IEnumerable<Cuisson> Fours { get; }
     public IEnumerable<Emballage> Emballeuses { get; }
 
-    public Usine(ThreadSafeRandomNumberGenerator rng, ParamètresUsine organisationUsine)
+    public Usine(ThreadSafeRandomNumberGenerator rng, ParamètresUsine organisationUsine, ITraceSink traceSink)
     {
         if (organisationUsine.NombrePréparateurs + organisationUsine.NombreEmballeuses + organisationUsine.NombreFours > TailleMaxUsine)
             throw new InvalidOperationException(
                 $"L'usine est pleine, elle peut compter au maximum {TailleMaxUsine} machines");
+        _traceSink = traceSink;
         OrganisationUsine = organisationUsine;
 
         Préparateurs = Enumerable
             .Range(0, organisationUsine.NombrePréparateurs)
-            .Select(_ => new Préparation(rng, organisationUsine.ParamètresPréparation));
+            .Select(_ => new Préparation(rng, organisationUsine.ParamètresPréparation, traceSink));
 
         Fours = Enumerable
             .Range(0, organisationUsine.NombreFours)
-            .Select(_ => new Cuisson(rng, organisationUsine.ParamètresCuisson));
+            .Select(_ => new Cuisson(rng, organisationUsine.ParamètresCuisson, traceSink));
 
         Emballeuses = Enumerable
             .Range(0, organisationUsine.NombreEmballeuses)
-            .Select(_ => new Emballage(rng, organisationUsine.ParamètresEmballage));
+            .Select(_ => new Emballage(rng, organisationUsine.ParamètresEmballage, traceSink));
     }
 
     public IEnumerable<Plat> StockInfiniPlats 
@@ -46,6 +49,7 @@ internal class Usine : IUsine
             {
                 var plat = new Plat();
                 _platsCréés.Add(plat);
+                _traceSink.RecordTrace(new ProductionTraceStep(plat, EtapeProduction.ProductionPlat, DateTime.Now));
                 yield return plat;
             }
             // ReSharper disable once IteratorNeverReturns

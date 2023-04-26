@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CakeMachine.Fabrication.ContexteProduction;
 using CakeMachine.Fabrication.Elements;
+using CakeMachine.Fabrication.Tracing;
 using CakeMachine.Simulation.Algorithmes;
 
 namespace CakeMachine.Simulation;
@@ -36,7 +37,12 @@ internal class SingleAlgorithmRunner
     {
         var stopWatch = new Stopwatch();
 
-        var builder = new UsineBuilder();
+        var traceSink = new BagSink();
+        var builder = new UsineBuilder
+        {
+            TraceSink = traceSink
+        };
+
         _algorithme.ConfigurerUsine(builder);
         var usine = builder.Build();
 
@@ -63,6 +69,7 @@ internal class SingleAlgorithmRunner
                 var gâteau = producteur.Current;
 
                 if (!PeutContinuer()) break;
+                traceSink.RecordTrace(new ProductionTraceStep(gâteau, EtapeProduction.Livraison, DateTime.Now));
                 gâteauxProduits.Add(producteur.Current);
                 if (gâteau.EstConforme) gâteauxConformes++;
             }
@@ -84,6 +91,7 @@ internal class SingleAlgorithmRunner
                 var gâteau = producteur.Current;
 
                 if (!PeutContinuer()) break;
+                traceSink.RecordTrace(new ProductionTraceStep(gâteau, EtapeProduction.Livraison, DateTime.Now));
                 gâteauxProduits.Add(gâteau);
                 if (gâteau.EstConforme) gâteauxConformes++;
             }
@@ -104,6 +112,6 @@ internal class SingleAlgorithmRunner
             throw new InvalidOperationException("Vous avez tenté de réutiliser un plat, repréparer un gâteau raté, " +
                                                 "recuire un gâteau mal cuit ou réemballer un gâteau mal emballé. C'est interdit.");
 
-        return new RésultatSimulation(_algorithme, true, stopWatch.Elapsed, destinationPlats);
+        return new RésultatSimulation(_algorithme, true, stopWatch.Elapsed, destinationPlats, traceSink);
     }
 }

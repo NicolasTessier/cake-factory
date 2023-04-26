@@ -11,4 +11,12 @@ internal static class AsyncToSyncEnumerableExtensions
 
         return list;
     }
+
+#pragma warning disable CS1998
+    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<T> enumerable)
+#pragma warning restore CS1998
+    {
+        foreach (var element in enumerable)
+            yield return element;
+    }
 }

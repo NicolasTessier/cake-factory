@@ -2,6 +2,8 @@
 
 internal class Plat : IConforme
 {
+    private readonly Guid _guidPlat = Guid.NewGuid();
+
     /// <inheritdoc />
     public bool EstConforme => true;
 
@@ -17,4 +19,7 @@ internal class Plat : IConforme
                                                 "N'essayez pas de frauder.");
         _hasSuccessor = true;
     }
+
+    /// <inheritdoc />
+    public override string ToString() => "Plat " + _guidPlat.ToString();
 }

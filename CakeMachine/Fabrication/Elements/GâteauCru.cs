@@ -45,4 +45,7 @@ internal class GâteauCru : IConforme, IEquatable<GâteauCru>
 
     /// <inheritdoc />
     public override int GetHashCode() => PlatSousJacent.GetHashCode();
+
+    /// <inheritdoc />
+    public override string ToString() => $"Gâteau Cru [{PlatSousJacent}]";
 }

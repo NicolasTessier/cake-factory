@@ -36,4 +36,7 @@ internal class GâteauEmballé : IConforme, IEquatable<GâteauEmballé>
 
     /// <inheritdoc />
     public override int GetHashCode() => _gâteau.GetHashCode();
+
+    /// <inheritdoc />
+    public override string ToString() => $"Gâteau Emballé [{_gâteau}]";
 }
